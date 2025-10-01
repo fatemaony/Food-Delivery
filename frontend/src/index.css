@@ -1,0 +1,144 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@plugin "daisyui" {
+
+  themes: cupcake --default, forest;
+
+}
+
+
+
+@plugin "daisyui/theme" {
+
+  name: "light";
+
+  default: true;
+
+  /* Override colors to your brand's amber and black */
+
+  --color-base-100: #fffbeb; /* amber-50 */
+
+  --color-base-200: #fef3c7;
+
+  --color-base-300: #f7f9fa;
+
+  --color-base-400: #f7f9fa;
+
+  --color-base-content: #000000; /* Black */
+
+
+
+  --color-primary: #d97706; /* amber-600 */
+
+  --color-primary-content: #ffffff;
+
+
+
+  --color-secondary: #b45309; /* amber-700 */
+
+  --color-secondary-content: #ffffff;
+
+
+
+  --color-accent: rgb(180 83 9); /* amber-800 */
+
+  --color-accent-content: #ffffff;
+
+
+
+  --color-neutral: #000000; /* gray-700 */
+
+  --color-neutral-content: #ffffff;
+
+}
+
+
+
+@plugin "daisyui/theme" {
+
+  name: "forest";
+
+  color-scheme: dark;
+
+
+
+  --color-base-100: #1d2a2c;
+
+  --color-base-200: #2a3c3c;
+
+  --color-base-300: black;
+
+  --color-base-400: #1d2a2c;
+
+
+
+  --color-base-content: #e0e0e0;
+
+
+
+  --color-primary: #d97706;
+
+  --color-primary-content: #ffffff;
+
+
+
+  --color-secondary: #b45309;
+
+  --color-secondary-content: #ffffff;
+
+
+
+  --color-accent: #92400e;
+
+  --color-accent-content: #ffffff;
+
+
+
+  --color-neutral: white;
+
+  --color-neutral-content: #ffffff;
+
+
+
+  --color-info: #3abff8;
+
+  --color-info-content: #ffffff;
+
+  --color-success: #36d399;
+
+  --color-success-content: #000000;
+
+  --color-warning: #fbbd23;
+
+  --color-warning-content: #000000;
+
+  --color-error: #f87272;
+
+  --color-error-content: #ffffff;
+
+}
+
+
+
+@theme {
+
+  --font-aladin: Aladin;
+
+}
+
+
+
+body {
+
+  font-family: poppins;
+
+}
+
+
+
+a.active {
+
+  @apply text-amber-700;
+
+}
