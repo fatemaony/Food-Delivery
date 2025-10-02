@@ -6,6 +6,8 @@ import dotenv from 'dotenv'
 
 import productRoutes from "./routes/productRoutes.js"
 import userRoutes from "./routes/userRoutes.js"
+import menuRoutes from "./routes/menuRoutes.js"
+import reviewRoutes from "./routes/reviewRoutes.js"
 import { sql } from './config/db.js'
 import { ajt } from './lib/arcjet.js'
 dotenv.config()
@@ -40,7 +42,8 @@ app.use(async (req, res, next) => {
 
 app.use("/api/products",productRoutes);
 app.use("/api/users",userRoutes);
-
+app.use("/api/menus",menuRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 async function initDB() {
   try {
@@ -53,8 +56,19 @@ async function initDB() {
     price DECIMAL(10, 2) NOT NULL,
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`;
+    
+    // Menu Table
+    await sql`
+    CREATE TABLE IF NOT EXISTS menus(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    image VARCHAR(255) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`;
 
-    // user table
+    // user table (create before reviews due to foreign key)
     await sql`
     CREATE TABLE IF NOT EXISTS users(
     id SERIAL PRIMARY KEY,
@@ -65,7 +79,27 @@ async function initDB() {
     role VARCHAR(50) DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`;
-    console.log("Database inistialized successfully")
+
+    // Reviews table with user_name column
+    await sql`
+    CREATE TABLE IF NOT EXISTS reviews(
+    id SERIAL PRIMARY KEY,
+    menu_id INTEGER REFERENCES menus(id) ON DELETE CASCADE,
+    user_email VARCHAR(255) NOT NULL,
+    user_name VARCHAR(255) NOT NULL,
+    user_image VARCHAR(255),
+    rating INTEGER CHECK (rating >= 1 AND rating <= 5) NOT NULL,
+    comment TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`;
+
+    // Add user_name column if it doesn't exist (for existing databases)
+    await sql`
+    ALTER TABLE reviews 
+    ADD COLUMN IF NOT EXISTS user_name VARCHAR(255)
+    `;
+
+    console.log("Database initialized successfully")
   } catch (error) {
     console.log("Error initDB",error)
   }

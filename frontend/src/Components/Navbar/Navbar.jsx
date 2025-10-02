@@ -2,12 +2,13 @@ import React from 'react'
 import { Link } from 'react-router'
 import Logo from '../Logo/Logo'
 import useAuth from '../../Hooks/useAuth'
+import useUserRole from '../../Hooks/useUserRole'
 import Swal from 'sweetalert2'
 
 const Navbar = () => {
   const navItems = <>
   <Link to={"/"}><li className='text-secondary font-bold hover:underline  px-5'>Home</li></Link>
-  <Link to={"/"}><li className='text-secondary font-bold hover:underline  px-5'>Menu</li></Link>
+  <Link to={"/menus"}><li className='text-secondary font-bold hover:underline  px-5'>Menu</li></Link>
   <Link to={"/"}><li className='text-secondary font-bold hover:underline  px-5'>Order</li></Link>
   <Link to={"/"}><li className='text-secondary font-bold hover:underline  px-5'>About</li></Link>
   <Link to={"/"}><li className='text-secondary font-bold hover:underline px-5'>Contact</li></Link>
@@ -16,6 +17,13 @@ const Navbar = () => {
 
 
 const { user, loading, signOutUser } = useAuth();
+const { role, roleLoading } = useUserRole();
+
+// Get dashboard link based on user role
+const getDashboardLink = () => {
+  if (!user || !role) return '/dashboard';
+  return role.toLowerCase() === 'admin' ? '/dashboard/admin' : '/dashboard/user';
+};
 
 const handleLogout = async () => {
   try {
@@ -54,7 +62,30 @@ const handleLogout = async () => {
         tabIndex={0}
         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
         {navItems}
+
+        <div className="lg:hidden flex flex-row gap-2">
+    {user && (
+      <div>
+        <Link to={getDashboardLink()}>
+          <button className='btn btn-primary'>Dashboard</button>
+        </Link>
+      </div>
+    )}
+      {user ? (
+        <div className="flex items-center gap-4">
+          <button onClick={handleLogout} className="btn btn-outline btn-error btn-sm">
+            Sign Out
+          </button>
+        </div>
+      ) : (
+        <Link to="/signin" className="btn btn-outline btn-secondary">
+          Sign In
+        </Link>
+      )}
+    </div>
       </ul>
+
+      
     </div>
     
     <Logo/>
@@ -65,12 +96,16 @@ const handleLogout = async () => {
       {navItems}
     </ul>
   </div>
-  <div className="navbar-end">
+  <div className="navbar-end hidden lg:flex gap-2">
+    {user && (
+      <div>
+        <Link to={getDashboardLink()}>
+          <button className='btn btn-primary'>Dashboard</button>
+        </Link>
+      </div>
+    )}
       {user ? (
         <div className="flex items-center gap-4">
-          <span className="hidden sm:inline text-sm">
-            Welcome, {user.displayName || user.email?.split('@')[0]}
-          </span>
           <button onClick={handleLogout} className="btn btn-outline btn-error btn-sm">
             Sign Out
           </button>

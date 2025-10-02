@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { FaEye, FaEyeSlash, FaUser, FaCamera } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../Hooks/useAuth';
+import useAxios from '../../Hooks/useAxios';
 import Swal from 'sweetalert2';
 
 const SignUp = () => {
@@ -12,6 +13,7 @@ const SignUp = () => {
   const [photoPreview, setPhotoPreview] = useState('');
   const { createUser } = useAuth();
   const navigate = useNavigate();
+  const axiosInstance = useAxios();
   
 
   const {
@@ -30,6 +32,20 @@ const SignUp = () => {
     createUser(data.email, data.password)
       .then(result => {
         console.log(result.user);
+        
+        // Save user data to backend
+        const userData = {
+          name: data.fullName,
+          email: data.email,
+          image: data.photoUrl || 'https://via.placeholder.com/150', // Default image if no photo provided
+          password: data.password, // Note: In production, you should hash this or handle it differently
+          role: 'user' // Default role for new users
+        };
+
+        return axiosInstance.post('/api/users', userData);
+      })
+      .then(backendResponse => {
+        console.log('User saved to backend:', backendResponse.data);
         Swal.fire({
           title: 'Welcome! 🎉',
           text: 'Your account has been created successfully.',
@@ -45,9 +61,19 @@ const SignUp = () => {
       })
       .catch(error => {
         console.log(error);
+        
+        // Handle different types of errors
+        let errorMessage = 'Signup failed. Please try again.';
+        
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error?.message) {
+          errorMessage = error.message;
+        }
+
         Swal.fire({
           title: 'Error',
-          text: error?.message || 'Signup failed. Please try again.',
+          text: errorMessage,
           icon: 'error',
           confirmButtonText: 'Try Again'
         });

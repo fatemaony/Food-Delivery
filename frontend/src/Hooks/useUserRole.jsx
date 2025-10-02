@@ -1,44 +1,34 @@
-import { useEffect, useState } from 'react'
-import useAuth from './useAuth'
-import useAxios from './useAxios'
+import { useEffect, useState } from 'react';
+import useAuth from './useAuth';
+import useAxios from './useAxios';
+
 
 const useUserRole = () => {
-  const { user } = useAuth()
-  const axios = useAxios()
-  const [role, setRole] = useState('user')
-  const [loading, setLoading] = useState(true)
+    const { user, loading } = useAuth();
+    const [role, setRole] = useState(null);
+    const [roleLoading, setRoleLoading] = useState(true);
+    const axiosSecure = useAxios()
 
-  useEffect(() => {
-    let isMounted = true
-    const fetchRole = async () => {
-      try {
-        if (!user?.email) {
-          if (isMounted) {
-            setRole('user')
-            setLoading(false)
-          }
-          return
+    useEffect(() => {
+        if (user?.email && !loading) {
+            const fetchRole = async () => {
+                try {
+                    const response = await axiosSecure.get(`/api/users/email/${user.email}`);
+                    setRole(response.data.data.role);
+                } catch (error) {
+                    console.error('Error fetching user role:', error);
+                    setRole('user'); // Default to user role
+                } finally {
+                    setRoleLoading(false);
+                }
+            };
+            fetchRole();
+        } else if (!loading && !user) {
+            setRoleLoading(false);
         }
-        const res = await axios.get('/api/users')
-        const found = Array.isArray(res.data?.data)
-          ? res.data.data.find(u => u.email === user.email)
-          : null
-        if (isMounted) {
-          setRole(found?.role || 'user')
-          setLoading(false)
-        }
-      } catch (err) {
-        if (isMounted) {
-          setRole('user')
-          setLoading(false)
-        }
-      }
-    }
-    fetchRole()
-    return () => { isMounted = false }
-  }, [user?.email, axios])
+    }, [user, loading, axiosSecure]);
 
-  return { role, loading }
-}
+    return { role, roleLoading };
+};
 
-export default useUserRole
+export default useUserRole;

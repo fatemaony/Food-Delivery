@@ -4,14 +4,18 @@ export const createUser = async(req, res)=>{
 
   const {name, email, image, password, role}=req.body
 
-  if (!name || !email || !image || !password || !role) {
-    return res.status(400).json({success:false,message:"all fields are required"} )
+  // Make image optional and provide default value
+  const userImage = image || 'https://via.placeholder.com/150';
+  const userRole = role || 'user';
+
+  if (!name || !email || !password) {
+    return res.status(400).json({success:false,message:"Name, email, and password are required"} )
   }
 
   try {
     const newUser = await sql`
     INSERT INTO users (name, email, image, password, role)
-    VALUES(${name},${email},${image},${password},${role})
+    VALUES(${name},${email},${userImage},${password},${userRole})
     RETURNING *
     `;
 
@@ -41,6 +45,22 @@ export const getUser = async(req, res)=>{
     const user = await sql`
     SELECT * FROM users WHERE id=${id}
     `;
+    res.status(200).json({success:true, data:user[0]})
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+export const getUserByEmail = async(req, res)=>{
+  const { email }=req.params;
+
+  try {
+    const user = await sql`
+    SELECT * FROM users WHERE email=${email}
+    `;
+    if (user.length === 0) {
+      return res.status(404).json({success:false, message:"User not found"})
+    }
     res.status(200).json({success:true, data:user[0]})
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

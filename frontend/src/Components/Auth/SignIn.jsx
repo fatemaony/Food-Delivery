@@ -2,12 +2,14 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../Hooks/useAuth';
+import useAxios from '../../Hooks/useAxios';
 import Swal from 'sweetalert2';
  // You'll need to create these functions
 
 const SignIn = () => {
   const navigate = useNavigate();
   const {signInUser,signInWithGoogle} = useAuth()
+  const axiosInstance = useAxios();
   const {
     register,
     handleSubmit,
@@ -42,17 +44,44 @@ const SignIn = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithGoogle();
+      const result = await signInWithGoogle();
+      console.log('Google sign-in result:', result.user);
+      
+      // Save or update user data in backend
+      const userData = {
+        name: result.user.displayName || 'Google User',
+        email: result.user.email,
+        image: result.user.photoURL || 'https://via.placeholder.com/150',
+        password: 'google-auth', // Placeholder since Google handles auth
+        role: 'user'
+      };
+
+      try {
+        // First, try to get the user to check if they exist
+        const existingUser = await axiosInstance.get(`/api/users/email/${userData.email}`);
+        console.log('User already exists:', existingUser.data);
+      } catch (getError) {
+        // If user doesn't exist (404), create new user
+        if (getError.response?.status === 404) {
+          try {
+            const newUser = await axiosInstance.post('/api/users', userData);
+            console.log('New Google user created in backend:', newUser.data);
+          } catch (createError) {
+            console.error('Error creating Google user in backend:', createError);
+            // Continue with login even if backend save fails
+          }
+        }
+      }
+      
       Swal.fire({
         title: 'Welcome! 🎉',
         text: 'You have successfully logged in.',
         icon: 'success',
         confirmButtonText: 'Go to Home',
         buttonsStyling: false,
-          customClass: {
-            confirmButton: 'btn btn-primary'
-          }
-        
+        customClass: {
+          confirmButton: 'btn btn-primary'
+        }
       })
       navigate('/'); // Redirect to home page after successful login
     } catch (error) {
