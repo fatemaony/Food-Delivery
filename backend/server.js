@@ -43,7 +43,8 @@ app.use(async (req, res, next) => {
 app.use("/api/products",productRoutes);
 app.use("/api/users",userRoutes);
 app.use("/api/menus",menuRoutes);
-app.use("/api/reviews", reviewRoutes);
+app.use("/api/reviews",reviewRoutes);
+
 
 async function initDB() {
   try {
@@ -80,24 +81,35 @@ async function initDB() {
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`;
 
-    // Reviews table with user_name column
+    // Reviews table with rating column
     await sql`
-    CREATE TABLE IF NOT EXISTS reviews(
-    id SERIAL PRIMARY KEY,
-    menu_id INTEGER REFERENCES menus(id) ON DELETE CASCADE,
-    user_email VARCHAR(255) NOT NULL,
-    user_name VARCHAR(255) NOT NULL,
-    user_image VARCHAR(255),
-    rating INTEGER CHECK (rating >= 1 AND rating <= 5) NOT NULL,
-    comment TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    CREATE TABLE IF NOT EXISTS reviews (
+      id SERIAL PRIMARY KEY,
+      menu_id INTEGER NOT NULL REFERENCES menus(id) ON DELETE CASCADE,
+      user_email VARCHAR(255) NOT NULL,
+      user_name VARCHAR(255) NOT NULL,
+      user_image VARCHAR(255) NOT NULL,
+      comment TEXT NOT NULL,
+      rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`;
+    
+    // Add rating column if it doesn't exist (for existing databases)
+    try {
+      await sql`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS rating INTEGER CHECK (rating >= 1 AND rating <= 5)`;
+      console.log("Rating column added or already exists");
+    } catch (alterError) {
+      console.log("Rating column already exists or error adding it:", alterError.message);
+    }
 
-    // Add user_name column if it doesn't exist (for existing databases)
-    await sql`
-    ALTER TABLE reviews 
-    ADD COLUMN IF NOT EXISTS user_name VARCHAR(255)
-    `;
+     // Enforce one review per user per menu
+     try {
+       await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_review_per_user_menu ON reviews(menu_id, user_email)`;
+       console.log("Unique index for one-review-per-user-per-menu ensured");
+     } catch (idxError) {
+       console.log("Error creating unique index:", idxError.message);
+     }
 
     console.log("Database initialized successfully")
   } catch (error) {
