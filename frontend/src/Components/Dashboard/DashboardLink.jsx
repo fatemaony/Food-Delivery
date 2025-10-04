@@ -48,8 +48,8 @@ const DashboardLink = () => {
 
     const userLinks = [
       { path: '/dashboard/user', name: 'Home', icon: <IoHomeOutline className='text-lg' />},
-      { path: '/dashboard/user/watchlist', name: 'Manage Watchlist', icon: <FiList className="text-lg" /> },
-      { path: "/dashboard/user/order", name: 'My Orders', icon: <FiShoppingBag className="text-lg" /> },
+      { path: '/dashboard/user/addToCart', name: 'My Cart', icon: <FiList className="text-lg" /> },
+      { path: "/dashboard/user/myOrders", name: 'My Orders', icon: <FiShoppingBag className="text-lg" /> },
       { path: '/dashboard/user/checkout', name: 'Cart Items', icon: <FiShoppingBag className="text-lg" /> },
     ];
 
@@ -59,7 +59,7 @@ const DashboardLink = () => {
       { path: '/dashboard/admin/allMenu', name: 'All Menus', icon: <FiPackage className="text-lg" /> },
       { path: '/dashboard/admin/addAdvertisements', name: 'Add Advertisements', icon: <FiSpeaker className="text-lg" /> },
       { path: '/dashboard/admin/advertisements', name: 'All Advertisements', icon: <FiSpeaker className="text-lg" /> },
-      { path: '/dashboard/admin/allOrder', name: 'All Orders', icon: <FiShoppingCart className="text-lg" /> },
+      { path: '/dashboard/Admin/allOrders', name: 'All Orders', icon: <FiShoppingCart className="text-lg" /> },
       { path: '/dashboard/admin/users', name: 'All Users', icon: <FiUsers className="text-lg" /> },
     ];
 

@@ -3,18 +3,22 @@ import { FaSpinner, FaExclamationTriangle, FaSearch, FaTimes, FaChevronLeft, FaC
 import { IoSearch } from "react-icons/io5";
 import MenuCard from './MenuCard';
 import useAxios from '../../Hooks/useAxios';
+import useAuth from '../../Hooks/useAuth';
+import { useNavigate } from 'react-router';
+import Swal from 'sweetalert2';
 
 const AllMenuCard = () => {
   const [menus, setMenus] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState(new Set());
-  const [cart, setCart] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredMenus, setFilteredMenus] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(9);
   const axiosInstance = useAxios();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchMenus();
@@ -97,8 +101,7 @@ const AllMenuCard = () => {
       setFavorites(newFavorites);
       saveFavorites(newFavorites);
       
-      // Here you could also make an API call to save favorites to backend
-      // await axiosInstance.post('/api/favorites', { menuId, isFavorite });
+      // You could also make an API call here to save favorites to a backend
     } catch (error) {
       console.error('Error updating favorites:', error);
       throw error;
@@ -106,30 +109,51 @@ const AllMenuCard = () => {
   };
 
   const handleAddToCart = async (menu) => {
+    if (!user) {
+      await Swal.fire({
+        title: 'Please Sign In',
+        text: "You need to be signed in to add items to your cart.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sign In',
+        cancelButtonText: 'Cancel',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/signin', { state: { from: location } });
+        }
+      });
+      // Throw an error to be caught by the calling function in MenuCard
+      throw new Error("User not authenticated.");
+    }
+  
     try {
-      const newCart = [...cart, { ...menu, quantity: 1, addedAt: new Date() }];
-      setCart(newCart);
-      localStorage.setItem('shoppingCart', JSON.stringify(newCart));
+      const userResponse = await axiosInstance.get(`/api/users/email/${user.email}`);
+      if (!userResponse.data.success || !userResponse.data.data) {
+        throw new Error("Could not find user information.");
+      }
       
-      // Here you could also make an API call to save cart to backend
-      // await axiosInstance.post('/api/cart', { menuId: menu.id, quantity: 1 });
+      const dbUserId = userResponse.data.data.id;
+  
+      const cartData = {
+        user_id: dbUserId,
+        menu_id: menu.id,
+        quantity: 1
+      };
+  
+      const response = await axiosInstance.post('/api/cart', cartData);
+  
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Failed to add item to cart.");
+      }
     } catch (error) {
       console.error('Error adding to cart:', error);
+      // Re-throw the error so MenuCard can catch it and display a message
       throw error;
     }
   };
 
   const handleViewDetails = (menu) => {
-    // You can customize this function to navigate to a details page
-    // or show a custom modal instead of the default SweetAlert modal
     console.log('Viewing details for:', menu);
-    
-    // Example: Navigate to a details page
-    // navigate(`/menu/${menu.id}`);
-    
-    // Example: Open a custom modal
-    // setSelectedMenu(menu);
-    // setShowDetailsModal(true);
   };
 
   const handleSearchChange = (e) => {
@@ -144,13 +168,8 @@ const AllMenuCard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-base-200 py-6 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <div className="flex flex-col items-center gap-4">
-              <FaSpinner className="text-4xl text-primary animate-spin" />
-              <p className="text-base-content/70">Loading menu items...</p>
-            </div>
-          </div>
+        <div className="flex items-center justify-center h-64">
+            <FaSpinner className="text-4xl text-primary animate-spin" />
         </div>
       </div>
     );
@@ -159,19 +178,14 @@ const AllMenuCard = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-base-200 py-6 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <div className="flex flex-col items-center gap-4 text-center">
-              <FaExclamationTriangle className="text-4xl text-error" />
+        <div className="flex items-center justify-center h-64 text-center">
+            <div>
+              <FaExclamationTriangle className="text-4xl text-error mx-auto mb-2" />
               <p className="text-base-content/70">{error}</p>
-              <button 
-                onClick={fetchMenus}
-                className="btn btn-primary"
-              >
+              <button onClick={fetchMenus} className="btn btn-primary mt-4">
                 Try Again
               </button>
             </div>
-          </div>
         </div>
       </div>
     );
@@ -188,84 +202,36 @@ const AllMenuCard = () => {
           <p className="text-base-content/70 mb-6">
             Discover amazing dishes crafted with love and passion
           </p>
-          {cart.length > 0 && (
-            <div className="badge badge-primary badge-lg mb-6">
-              {cart.length} item{cart.length !== 1 ? 's' : ''} in cart
-            </div>
-          )}
 
-        
-{/* Search Bar */}
-<div className="max-w-md mx-auto mb-6">
-  <div className="relative">
-    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-      <IoSearch className="h-5 w-5 text-base-content/60" />
-    </div>
-    <input
-      type="text"
-      placeholder="Search menu items..."
-      value={searchTerm}
-      onChange={handleSearchChange}
-      className="input input-bordered w-full pl-10 pr-12 py-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-    />
-    
-    {searchTerm && (
-      <button
-        onClick={clearSearch}
-        className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-error transition-colors duration-200"
-        aria-label="Clear search"
-      >
-        <FaTimes className="h-4 w-4 text-base-content/50 hover:text-error" />
-      </button>
-    )}
-  </div>
-  
-  {/* Search Results Info */}
-  {searchTerm && (
-    <div className="mt-3 text-sm text-base-content/70 px-1">
-      {filteredMenus.length === 0 ? (
-        <span className="text-error flex items-center gap-1">
-          <FaExclamationTriangle className="h-3 w-3" />
-          No items found matching "{searchTerm}"
-        </span>
-      ) : (
-        <span className="flex items-center gap-1">
-          <IoSearch className="h-3 w-3" />
-          {filteredMenus.length} of {menus.length} item{menus.length !== 1 ? 's' : ''} found
-        </span>
-      )}
-    </div>
-  )}
-</div>
+            {/* Search Bar */}
+            <div className="max-w-md mx-auto mb-6">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <IoSearch className="h-5 w-5 text-base-content/60" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search menu items..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="input input-bordered w-full pl-10 pr-12 py-4"
+                />
+                
+                {searchTerm && (
+                  <button
+                    onClick={clearSearch}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    aria-label="Clear search"
+                  >
+                    <FaTimes className="h-4 w-4 text-base-content/50 hover:text-error" />
+                  </button>
+                )}
+              </div>
+          </div>
         </div>
 
         {/* Menu Grid */}
-        {menus.length === 0 ? (
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body text-center py-12">
-              <h3 className="text-2xl font-semibold text-base-content mb-2">No Menu Items Available</h3>
-              <p className="text-base-content/70">
-                We're working on adding delicious items to our menu. Check back soon!
-              </p>
-            </div>
-          </div>
-        ) : filteredMenus.length === 0 && searchTerm ? (
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body text-center py-12">
-              <FaSearch className="text-6xl text-base-content/30 mx-auto mb-4" />
-              <h3 className="text-2xl font-semibold text-base-content mb-2">No Results Found</h3>
-              <p className="text-base-content/70 mb-4">
-                No menu items match your search for "{searchTerm}"
-              </p>
-              <button 
-                onClick={clearSearch}
-                className="btn btn-primary"
-              >
-                Clear Search
-              </button>
-            </div>
-          </div>
-        ) : (
+        {currentMenus.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {currentMenus.map((menu) => (
@@ -282,63 +248,22 @@ const AllMenuCard = () => {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex flex-col items-center gap-4 mt-8">
-                {/* Pagination Info */}
-                <div className="text-sm text-base-content/70">
-                  Showing {startIndex + 1} to {Math.min(endIndex, filteredMenus.length)} of {filteredMenus.length} menu items
-                  {searchTerm && (
-                    <span className="block mt-1">
-                      Search results for "{searchTerm}"
-                    </span>
-                  )}
-                </div>
-
-                {/* Pagination Buttons */}
-                <div className="flex items-center gap-2">
-                  {/* Previous Button */}
-                  <button
-                    onClick={goToPreviousPage}
-                    disabled={currentPage === 1}
-                    className={`btn btn-sm ${
-                      currentPage === 1 ? 'btn-disabled' : 'btn-outline'
-                    }`}
-                  >
-                    <FaChevronLeft className="text-xs" />
-                    Previous
-                  </button>
-
-                  {/* Page Numbers */}
-                  <div className="flex gap-1">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
-                      <button
-                        key={pageNumber}
-                        onClick={() => goToPage(pageNumber)}
-                        className={`btn btn-sm w-10 ${
-                          currentPage === pageNumber
-                            ? 'btn-primary'
-                            : 'btn-outline'
-                        }`}
-                      >
-                        {pageNumber}
-                      </button>
-                    ))}
+              <div className="flex justify-center">
+                  <div className="join">
+                      <button onClick={goToPreviousPage} disabled={currentPage === 1} className="join-item btn">«</button>
+                      <button className="join-item btn">Page {currentPage}</button>
+                      <button onClick={goToNextPage} disabled={currentPage === totalPages} className="join-item btn">»</button>
                   </div>
-
-                  {/* Next Button */}
-                  <button
-                    onClick={goToNextPage}
-                    disabled={currentPage === totalPages}
-                    className={`btn btn-sm ${
-                      currentPage === totalPages ? 'btn-disabled' : 'btn-outline'
-                    }`}
-                  >
-                    Next
-                    <FaChevronRight className="text-xs" />
-                  </button>
-                </div>
               </div>
             )}
           </>
+        ) : (
+          <div className="text-center py-12">
+            <h3 className="text-2xl font-semibold">No Menu Items Found</h3>
+            <p className="text-base-content/70 mt-2">
+              {searchTerm ? `No results for "${searchTerm}".` : "Please check back later!"}
+            </p>
+          </div>
         )}
       </div>
     </div>

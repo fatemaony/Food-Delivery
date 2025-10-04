@@ -45,20 +45,26 @@ const SignUp = () => {
         return axiosInstance.post('/api/users', userData);
       })
       .then(backendResponse => {
-        console.log('User saved to backend:', backendResponse.data);
-        Swal.fire({
-          title: 'Welcome! 🎉',
-          text: 'Your account has been created successfully.',
-          icon: 'success',
-          confirmButtonText: 'Go to Home',
-          buttonsStyling: false,
-          customClass: {
-            confirmButton: 'btn btn-primary'
-          }
-        }).then(() => {
-          navigate('/');
-        });
-      })
+  console.log('User saved to backend:', backendResponse.data);
+  
+  // Check if user was actually created
+  if (!backendResponse.data.success) {
+    throw new Error('Failed to create user in database');
+  }
+  
+  Swal.fire({
+    title: 'Welcome! 🎉',
+    text: 'Your account has been created successfully.',
+    icon: 'success',
+    confirmButtonText: 'Go to Home',
+    buttonsStyling: false,
+    customClass: {
+      confirmButton: 'btn btn-primary'
+    }
+  }).then(() => {
+    navigate('/');
+  });
+})
       .catch(error => {
         console.log(error);
         

@@ -51,21 +51,37 @@ export const getUser = async(req, res)=>{
   }
 }
 
-export const getUserByEmail = async(req, res)=>{
-  const { email }=req.params;
-
+export const getUserByEmail = async (req, res) => {
   try {
+    const { email } = req.params;
+    
     const user = await sql`
-    SELECT * FROM users WHERE email=${email}
+      SELECT id, name, email, image, role, created_at 
+      FROM users 
+      WHERE email = ${email}
     `;
+
     if (user.length === 0) {
-      return res.status(404).json({success:false, message:"User not found"})
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
     }
-    res.status(200).json({success:true, data:user[0]})
+
+    return res.status(200).json({ 
+      success: true, 
+      data: user[0]
+    });
+
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Error in getUserByEmail:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Failed to fetch user",
+      error: error.message 
+    });
   }
-}
+};
 export const updateUser = async(req, res)=>{
 
   const {id}=req.params;

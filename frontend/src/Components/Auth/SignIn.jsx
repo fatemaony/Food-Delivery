@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import useAuth from '../../Hooks/useAuth';
 import useAxios from '../../Hooks/useAxios';
 import Swal from 'sweetalert2';
- // You'll need to create these functions
+
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -32,14 +32,29 @@ const SignIn = () => {
           }
         
       })
-      navigate('/');// Redirect to home page after successful login
-    } catch (error) {
-      console.error('Login error:', error);
-      setError('root', {
-        type: 'manual',
-        message: getErrorMessage(error.code)
+      navigate('/');
+    } 
+    catch (getError) {
+    if (getError.response?.status === 404) {
+    try {
+      const newUser = await axiosInstance.post('/api/users', userData);
+      console.log('New Google user created in backend:', newUser.data);
+      
+      if (!newUser.data.success) {
+        throw new Error('Failed to save user to database');
+      }
+    } catch (createError) {
+      console.error('Error creating Google user in backend:', createError);
+      // Show error to user instead of silently continuing
+      Swal.fire({
+        title: 'Warning',
+        text: 'Signed in but failed to save profile. Some features may not work.',
+        icon: 'warning'
       });
     }
+  } else {
+    console.error('Error checking existing user:', getError);
+  }}
   };
 
   const handleGoogleSignIn = async () => {

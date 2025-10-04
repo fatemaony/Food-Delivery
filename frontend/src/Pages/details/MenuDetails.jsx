@@ -93,7 +93,7 @@ const MenuDetails = () => {
 
   const handleAddToCart = async () => {
     if (authLoading) {
-      return; // Don't show anything while auth is loading
+      return;
     }
     
     if (!user) {
@@ -105,26 +105,62 @@ const MenuDetails = () => {
       });
       return;
     }
-
+  
     setIsAddingToCart(true);
     try {
-      // Simulate adding to cart (you can implement actual cart logic here)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // For Firebase users, we need to get the database user ID
+      // First, check if user exists in your database, if not create them
+      const userResponse = await axiosInstance.get(`/api/users/email/${user.email}`);
       
-      await Swal.fire({
-        title: 'Added to Cart!',
-        text: `${menu.name} (${quantity}x) has been added to your cart.`,
-        icon: 'success',
-        timer: 1500,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end'
+      let dbUserId;
+      
+      if (userResponse.data.success && userResponse.data.data) {
+        // User exists in database, use that ID
+        dbUserId = userResponse.data.data.id;
+      } else {
+        // User doesn't exist in database, you might need to create them
+        // Or use a different approach based on your auth system
+        console.error('User not found in database');
+        await Swal.fire({
+          title: 'Error!',
+          text: 'User profile not found. Please try signing in again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+        return;
+      }
+  
+      const response = await axiosInstance.post(`/api/cart`, {
+        user_id: dbUserId, // Use the database user ID, not Firebase UID
+        menu_id: parseInt(id), // Ensure menu_id is integer
+        quantity: quantity
       });
+  
+      if (response.data.success) {
+        const result = await Swal.fire({
+          title: 'Added to Cart!',
+          text: `${menu.name} (${quantity}x) has been added to your cart.`,
+          icon: 'success',
+          showCancelButton: true,
+          confirmButtonText: 'View Cart',
+          cancelButtonText: 'Continue Shopping',
+          timer: 3000,
+          timerProgressBar: true
+        });
+  
+        setQuantity(1);
+  
+        if (result.isConfirmed) {
+          navigate('/dashboard/user/addToCart');
+        }
+      } else {
+        throw new Error('Failed to add to cart');
+      }
     } catch (error) {
       console.error('Error adding to cart:', error);
       await Swal.fire({
         title: 'Error!',
-        text: 'Failed to add item to cart. Please try again.',
+        text: error.response?.data?.message || 'Failed to add item to cart. Please try again.',
         icon: 'error',
         confirmButtonText: 'OK'
       });
@@ -172,7 +208,7 @@ const MenuDetails = () => {
     e.preventDefault();
     
     if (authLoading) {
-      return; // Don't show anything while auth is loading
+      return;
     }
     
     if (!user) {
@@ -217,14 +253,31 @@ const MenuDetails = () => {
           fetchReviews();
         }
       } else {
+        // Get user details from our database to ensure consistency
+        const userResponse = await axiosInstance.get(`/api/users/email/${user.email}`);
+
+        if (!userResponse.data.success || !userResponse.data.data) {
+          await Swal.fire({
+            title: 'Error!',
+            text: 'User profile not found. Please try signing in again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+          setIsSubmittingReview(false);
+          return; 
+        }
+
+        const dbUser = userResponse.data.data;
+
         const response = await axiosInstance.post('/api/reviews', {
           menu_id: id,
           user_email: user.email,
-          user_name: user.displayName || user.email.split('@')[0],
-          user_image: user.photoURL || '',
+          user_name: dbUser.name, // Use name from our DB
+          user_image: dbUser.image, // Use image from our DB
           rating: reviewForm.rating,
           comment: reviewForm.comment
         });
+
         if (response.data.success) {
           await Swal.fire({
             title: 'Review Submitted!',
@@ -243,7 +296,6 @@ const MenuDetails = () => {
       console.error('Error submitting review:', error);
       const message = error.response?.data?.message;
       if (message && message.toLowerCase().includes('already reviewed')) {
-        // Switch to edit mode automatically
         if (currentUserReview) {
           setEditingReviewId(currentUserReview.id);
           setReviewForm({ rating: currentUserReview.rating, comment: currentUserReview.comment });
@@ -678,3 +730,4 @@ const MenuDetails = () => {
 };
 
 export default MenuDetails;
+

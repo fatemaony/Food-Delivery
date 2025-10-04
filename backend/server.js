@@ -4,12 +4,17 @@ import morgan from 'morgan'
 import cors from 'cors'
 import dotenv from 'dotenv'
 
-import productRoutes from "./routes/productRoutes.js"
+
+
 import userRoutes from "./routes/userRoutes.js"
+import cartRoutes from './routes/cartRoutes.js'
 import menuRoutes from "./routes/menuRoutes.js"
 import reviewRoutes from "./routes/reviewRoutes.js"
+import orderRoutes from "./routes/orderRoutes.js"
+import statsRouter from './routes/statsRouter.js'
 import { sql } from './config/db.js'
 import { ajt } from './lib/arcjet.js'
+
 dotenv.config()
 const app =express()
 
@@ -40,24 +45,19 @@ app.use(async (req, res, next) => {
   }
 })
 
-app.use("/api/products",productRoutes);
+
 app.use("/api/users",userRoutes);
 app.use("/api/menus",menuRoutes);
 app.use("/api/reviews",reviewRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/stats",statsRouter);
+
 
 
 async function initDB() {
   try {
-    // product table 
-    await sql`
-    CREATE TABLE IF NOT EXISTS products(
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    image VARCHAR(255) NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )`;
-    
+   
     // Menu Table
     await sql`
     CREATE TABLE IF NOT EXISTS menus(
@@ -110,6 +110,53 @@ async function initDB() {
      } catch (idxError) {
        console.log("Error creating unique index:", idxError.message);
      }
+
+
+
+    //  cart table
+    await sql`
+    CREATE TABLE IF NOT EXISTS cart (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      menu_id INTEGER NOT NULL REFERENCES menus(id) ON DELETE CASCADE,
+      quantity INTEGER NOT NULL CHECK (quantity > 0),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE (user_id, menu_id) -- one entry per menu per user
+    )`;
+
+    await sql`
+    CREATE TABLE IF NOT EXISTS user_mapping (
+      firebase_uid VARCHAR(255) PRIMARY KEY,
+      database_user_id INTEGER REFERENCES users(id),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    `;
+
+    // ordered table
+
+    await sql`
+    CREATE TABLE IF NOT EXISTS orders (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  total_amount DECIMAL(10, 2) NOT NULL,
+  status VARCHAR(50) DEFAULT 'pending', -- pending, confirmed, delivered, cancelled
+  payment_method VARCHAR(50), -- cash, card, stripe, etc.
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`;
+
+
+  // ---- Order Items ----
+  await sql`
+  CREATE TABLE IF NOT EXISTS order_items (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    menu_id INTEGER NOT NULL REFERENCES menus(id) ON DELETE CASCADE,
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    price DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`;
 
     console.log("Database initialized successfully")
   } catch (error) {

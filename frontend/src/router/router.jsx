@@ -13,6 +13,10 @@ import AllMenu from "../Components/Dashboard/AdminDashboard/AllMenu";
 import AllMenuCard from "../Pages/Menu/AllMenuCard";
 import PrivateRouter from "../Private/PrivateRoute";
 import MenuDetails from "../Pages/details/MenuDetails";
+import AddCart from "../Components/Dashboard/UserDashboard/AddCart";
+import Payment from "../Components/Dashboard/UserDashboard/Order/Payment";
+import MyOrders from "../Components/Dashboard/UserDashboard/MyOrders";
+import AllOrders from "../Components/Dashboard/AdminDashboard/AllOrders";
 
 
 export const router =createBrowserRouter([
@@ -74,6 +78,24 @@ export const router =createBrowserRouter([
         {
           path:"admin/allMenu",
           Component:AllMenu
+        },
+        {
+          path:"Admin/allOrders",
+          Component:AllOrders
+        },
+        {
+          path:"user/addToCart",
+          element:<PrivateRouter>
+            <AddCart/>
+          </PrivateRouter>
+        },
+        {
+          path:"user/payment",
+          Component:Payment
+        },
+        {
+          path:"user/myOrders",
+          Component:MyOrders
         }
       ]
       
