@@ -167,7 +167,8 @@ async function initDB() {
 }
 
 initDB().then(()=>{
-  app.listen(PORT, ()=>{
-    console.log("Food Delivery server is running")
-  });
+  // app.listen(PORT, ()=>{
+  //   console.log("Food Delivery server is running")
+  // });
 })
+export default app;
