@@ -88,19 +88,26 @@ export const updateUser = async(req, res)=>{
   const {name, email, image, password, role}=req.body;
 
   try {
+    const currentUserResult = await sql`SELECT * FROM users WHERE id = ${id}`;
+    if (currentUserResult.length === 0) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    const currentUser = currentUserResult[0];
+
+    const updatedUserData = {
+      name: name !== undefined ? name : currentUser.name,
+      email: email !== undefined ? email : currentUser.email,
+      image: image !== undefined ? image : currentUser.image,
+      password: password !== undefined ? password : currentUser.password,
+      role: role !== undefined ? role : currentUser.role
+    };
+    
     const updateUser = await sql`
     UPDATE users
-    SET name=${name}, email=${email}, image=${image}, password=${password}, role=${role}
+    SET name=${updatedUserData.name}, email=${updatedUserData.email}, image=${updatedUserData.image}, password=${updatedUserData.password}, role=${updatedUserData.role}
     WHERE id=${id}
     RETURNING *
     `;
-
-    if (updateUser.length=== 0) {
-      return res.status(404).json({
-        success:false,
-        message:"User not found",
-      })
-    }
 
     res.status(200).json({success:true, data:updateUser[0]})
   } catch (error) {

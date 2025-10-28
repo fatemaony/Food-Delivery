@@ -33,6 +33,7 @@ export const getAllMenus = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 export const getMenu = async (req, res) => {
   const { id }=req.params;
 
@@ -88,4 +89,34 @@ export const deleteMenu = async (req, res) => {
   } catch (error) {
    res.status(500).json({ success: false, message: error.message }); 
   } 
+};
+
+// Get the top 6 most ordered menu items
+export const getPopularMenus = async (req, res) => {
+  try {
+    const popularMenus = await sql`
+      SELECT
+          m.id,
+          m.name,
+          m.image,
+          m.description,
+          m.price,
+          m.created_at,
+          SUM(oi.quantity) AS total_ordered
+      FROM
+          order_items oi
+      JOIN
+          menus m ON oi.menu_id = m.id
+      GROUP BY
+          m.id, m.name, m.image, m.description, m.price
+      ORDER BY
+          total_ordered DESC
+      LIMIT 6;
+    `;
+    
+    res.status(200).json({ success: true, data: popularMenus });
+  } catch (error) {
+    console.error("Error fetching popular menus:", error);
+    res.status(500).json({ success: false, message: "Failed to get popular menus.", error: error.message });
+  }
 };

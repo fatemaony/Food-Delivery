@@ -145,7 +145,11 @@ const MenuDetails = () => {
           confirmButtonText: 'View Cart',
           cancelButtonText: 'Continue Shopping',
           timer: 3000,
-          timerProgressBar: true
+          timerProgressBar: true,
+          buttonsStyling: false,
+          customClass: {
+            confirmButton: 'btn btn-primary'
+          }
         });
   
         setQuantity(1);

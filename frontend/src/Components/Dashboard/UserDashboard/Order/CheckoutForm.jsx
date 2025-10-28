@@ -60,7 +60,11 @@ const CheckoutForm = ({ cartItems, totalAmount }) => {
           title: 'Payment Successful!',
           text: 'Your order has been placed.',
           icon: 'success',
-          confirmButtonText: 'View My Orders'
+          confirmButtonText: 'View My Orders',
+          buttonsStyling: false,
+          customClass: {
+            confirmButton: 'btn btn-primary'
+          }
         }).then(() => {
           navigate('/dashboard/user/myOrders');
         });

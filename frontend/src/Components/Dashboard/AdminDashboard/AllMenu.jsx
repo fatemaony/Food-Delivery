@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaUtensils, FaEdit, FaTrash, FaSpinner, FaExclamationTriangle, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { useNavigate } from 'react-router';
 import useAxios from '../../../Hooks/useAxios';
 import Swal from 'sweetalert2';
 
@@ -10,6 +11,7 @@ const AllMenu = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
   const axiosInstance = useAxios();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchMenus();
@@ -54,6 +56,11 @@ const AllMenu = () => {
     }
   };
 
+  const handleEditMenu = (menuId) => {
+    // Navigate to edit menu page
+    navigate(`/dashboard/admin/editMenu/${menuId}`);
+  };
+
   const handleDeleteMenu = async (menuId, menuName) => {
     const result = await Swal.fire({
       title: 'Are you sure?',
@@ -74,7 +81,11 @@ const AllMenu = () => {
             title: 'Deleted!',
             text: 'Menu item has been deleted successfully.',
             icon: 'success',
-            confirmButtonText: 'Great!'
+            confirmButtonText: 'Great!',
+            buttonsStyling: false,
+            customClass: {
+              confirmButton: 'btn btn-primary'
+            }
           });
           // Refresh the menu list
           fetchMenus();
@@ -199,15 +210,7 @@ const AllMenu = () => {
                         <div>
                         <button
                           className="btn btn-sm btn-outline btn-primary flex-1"
-                          onClick={() => {
-                            // TODO: Implement edit functionality
-                            Swal.fire({
-                              title: 'Edit Feature',
-                              text: 'Edit functionality will be implemented soon!',
-                              icon: 'info',
-                              confirmButtonText: 'OK'
-                            });
-                          }}
+                          onClick={() => handleEditMenu(menu.id)}
                         >
                           <FaEdit className="text-xs" />
                           Edit

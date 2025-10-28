@@ -50,9 +50,9 @@ const AdminHome = () => {
     }
 
     return (
-        <div className="container mx-auto p-6 bg-base-200 min-h-screen">
-            <h1 className="text-4xl font-bold mb-8 text-base-content">Admin Dashboard</h1>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="container mx-auto px-10 py-5 bg-base-200 min-h-screen">
+            <h1 className="text-4xl font-bold mb-5 text-base-content">Admin Dashboard</h1>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                 <StatCard
                     icon={<FaUsers />}
                     title="Total Users"
@@ -95,7 +95,7 @@ const AdminHome = () => {
                 />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 py-6 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 pt-3 gap-5">
                     {/* Quick Stats Card */}
                     <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-200">
                         <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">

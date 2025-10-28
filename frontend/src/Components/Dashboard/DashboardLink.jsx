@@ -7,10 +7,12 @@ import {
   FiShoppingCart, FiUser, FiLogOut, 
 
 } from 'react-icons/fi';
-import { NavLink, useLocation } from 'react-router';
+
+import logoPicture from "../../assets/logo.png";
+import { Link, NavLink, useLocation } from 'react-router';
 import useAuth from '../../Hooks/useAuth';
 import useUserRole from '../../Hooks/useUserRole';
-import Logo from '../Logo/Logo';
+
 
 const DashboardLink = () => {
   const { user, SignOut } = useAuth(); 
@@ -50,17 +52,16 @@ const DashboardLink = () => {
       { path: '/dashboard/user', name: 'Home', icon: <IoHomeOutline className='text-lg' />},
       { path: '/dashboard/user/addToCart', name: 'My Cart', icon: <FiList className="text-lg" /> },
       { path: "/dashboard/user/myOrders", name: 'My Orders', icon: <FiShoppingBag className="text-lg" /> },
-      { path: '/dashboard/user/checkout', name: 'Cart Items', icon: <FiShoppingBag className="text-lg" /> },
+      
     ];
 
     const adminLinks = [
       { path: '/dashboard/admin', name: 'Home', icon: <IoHomeOutline className='text-lg' />},
       { path: '/dashboard/admin/AddMenu', name: 'Add Menu', icon: <FiPackage className="text-lg" /> },
       { path: '/dashboard/admin/allMenu', name: 'All Menus', icon: <FiPackage className="text-lg" /> },
-      { path: '/dashboard/admin/addAdvertisements', name: 'Add Advertisements', icon: <FiSpeaker className="text-lg" /> },
-      { path: '/dashboard/admin/advertisements', name: 'All Advertisements', icon: <FiSpeaker className="text-lg" /> },
+      
       { path: '/dashboard/Admin/allOrders', name: 'All Orders', icon: <FiShoppingCart className="text-lg" /> },
-      { path: '/dashboard/admin/users', name: 'All Users', icon: <FiUsers className="text-lg" /> },
+      { path: '/dashboard/admin/allUsers', name: 'All Users', icon: <FiUsers className="text-lg" /> },
     ];
 
     let roleLinks = [];
@@ -86,15 +87,18 @@ const DashboardLink = () => {
       animate="show"
       variants={containerVariants}
     >
-      <div className='mx-auto w-full'>
-      <Logo/>
-      </div>
-      <div className=" px-10 pt-10 border-b border-base-300">
-        <h1 className="text-xl font-bold">
-          {role && role.toLowerCase() === 'admin' ? 'Admin Dashboard' : 
-           role && role.toLowerCase() === 'vendor' ? 'Vendor Dashboard' : 'My Dashboard'}
+      <Link to={"/"}>
+      <div className='flex items-center justify-center mx-10'>
+      <img className='w-20 h-20' src={logoPicture} alt="logo" /> 
+       
+      <div className="text-primary ">
+        <h1 className="text-3xl font-bold">
+          {role && role.toLowerCase() === 'admin' ? 'Admin' : 
+           role && role.toLowerCase() === 'vendor' ? 'Vendor Dashboard' : 'Dashboard'}
         </h1>
       </div>
+      </div>
+      </Link>
 
       <nav className="flex-1 p-4 overflow-y-auto">
         <motion.ul className="space-y-2" variants={containerVariants}>

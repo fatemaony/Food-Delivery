@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { FaSpinner, FaExclamationTriangle, FaSearch, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { IoSearch } from "react-icons/io5";
-import MenuCard from './MenuCard';
-import useAxios from '../../Hooks/useAxios';
-import useAuth from '../../Hooks/useAuth';
+
 import { useNavigate } from 'react-router';
 import Swal from 'sweetalert2';
+import useAxios from '../../Hooks/useAxios';
+import useAuth from '../../Hooks/useAuth';
+import MenuCard from '../Menu/MenuCard';
 
-const AllMenuCard = () => {
+const PopularMenu = () => {
   const [menus, setMenus] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,28 +46,15 @@ const AllMenuCard = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentMenus = filteredMenus.slice(startIndex, endIndex);
 
-  // Pagination handlers
-  const goToPage = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
 
-  const goToPreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
 
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+
 
   const fetchMenus = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await axiosInstance.get('/api/menus');
+      const response = await axiosInstance.get('/api/menus/popular');
       if (response.data.success) {
         setMenus(response.data.data);
       }
@@ -156,14 +144,7 @@ const AllMenuCard = () => {
     console.log('Viewing details for:', menu);
   };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
 
-  const clearSearch = () => {
-    setSearchTerm('');
-    setCurrentPage(1);
-  };
 
   if (isLoading) {
     return (
@@ -192,43 +173,12 @@ const AllMenuCard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-100 to-amber-50 py-6 px-6 lg:px-20">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 py-6 px-6 lg:px-20">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-base-content mb-2 font-aladin">
-            Our Delicious Menu
-          </h1>
-          <p className="text-base-content/70 mb-6">
-            Discover amazing dishes crafted with love and passion
-          </p>
-
-            {/* Search Bar */}
-            <div className="max-w-md mx-auto mb-6">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <IoSearch className="h-5 w-5 text-base-content/60" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search menu items..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  className="input input-bordered w-full pl-10 pr-12 py-4"
-                />
-                
-                {searchTerm && (
-                  <button
-                    onClick={clearSearch}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    aria-label="Clear search"
-                  >
-                    <FaTimes className="h-4 w-4 text-base-content/50 hover:text-error" />
-                  </button>
-                )}
-              </div>
-          </div>
+        <div>
+          <h1 className='lg:text-6xl text-2xl text-primary font-bold text-center lg:py-10'>Popular Menus</h1>
         </div>
+       
 
         {/* Menu Grid */}
         {currentMenus.length > 0 ? (
@@ -246,23 +196,11 @@ const AllMenuCard = () => {
               ))}
             </div>
 
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="flex justify-center">
-                  <div className="join">
-                      <button onClick={goToPreviousPage} disabled={currentPage === 1} className="join-item btn">«</button>
-                      <button className="join-item btn">Page {currentPage}</button>
-                      <button onClick={goToNextPage} disabled={currentPage === totalPages} className="join-item btn">»</button>
-                  </div>
-              </div>
-            )}
           </>
         ) : (
           <div className="text-center py-12">
             <h3 className="text-2xl font-semibold">No Menu Items Found</h3>
-            <p className="text-base-content/70 mt-2">
-              {searchTerm ? `No results for "${searchTerm}".` : "Please check back later!"}
-            </p>
+            
           </div>
         )}
       </div>
@@ -270,4 +208,4 @@ const AllMenuCard = () => {
   );
 };
 
-export default AllMenuCard;
+export default PopularMenu;

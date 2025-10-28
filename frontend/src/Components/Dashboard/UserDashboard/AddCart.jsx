@@ -172,9 +172,18 @@ const AddCart = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold">{item.menu_name}</h3>
-                      <p className="text-sm opacity-70">${parseFloat(item.menu_price).toFixed(2)}</p>
+                      <p className="text-sm opacity-70">Each ${parseFloat(item.menu_price).toFixed(2)}</p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className='flex flex-col justify-between items-center'>
+                      
+                    <div className="font-semibold flex items-center">
+                        ${parseFloat(item.total_price).toFixed(2)}
+
+                        <button onClick={() => removeFromCart(item.id)} className="btn btn-ghost btn-sm text-error">
+                        <FaTrash />
+                    </button>
+                    </div>
+                    <div className="flex p-5 items-center gap-2">
                       <button onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1 || updatingItems.has(item.id)} className="btn btn-sm btn-circle btn-outline">
                         <FaMinus/>
                       </button>
@@ -182,13 +191,12 @@ const AddCart = () => {
                       <button onClick={() => updateQuantity(item.id, item.quantity + 1)} disabled={updatingItems.has(item.id)} className="btn btn-sm btn-circle btn-outline">
                         <FaPlus/>
                       </button>
+                    
                     </div>
-                    <div className="font-semibold">
-                        ${parseFloat(item.total_price).toFixed(2)}
+
+                    
                     </div>
-                    <button onClick={() => removeFromCart(item.id)} className="btn btn-ghost btn-sm text-error">
-                        <FaTrash />
-                    </button>
+                    
                  </div>
               </div>
             ))}
