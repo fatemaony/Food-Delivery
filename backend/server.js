@@ -4,7 +4,7 @@ import morgan from 'morgan'
 import cors from 'cors'
 import dotenv from 'dotenv'
 
-
+  
 
 import userRoutes from "./routes/userRoutes.js"
 import cartRoutes from './routes/cartRoutes.js'
@@ -54,7 +54,6 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/stats",statsRouter);
 
 
-
 async function initDB() {
   try {
    
@@ -80,7 +79,15 @@ async function initDB() {
     role VARCHAR(50) DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`;
+    
 
+    await sql`
+    CREATE TABLE IF NOT EXISTS user_mapping (
+      firebase_uid VARCHAR(255) PRIMARY KEY,
+      database_user_id INTEGER REFERENCES users(id),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    `;
     // Reviews table with rating column
     await sql`
     CREATE TABLE IF NOT EXISTS reviews (
@@ -125,13 +132,7 @@ async function initDB() {
       UNIQUE (user_id, menu_id) -- one entry per menu per user
     )`;
 
-    await sql`
-    CREATE TABLE IF NOT EXISTS user_mapping (
-      firebase_uid VARCHAR(255) PRIMARY KEY,
-      database_user_id INTEGER REFERENCES users(id),
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    `;
+    
 
     // ordered table
 

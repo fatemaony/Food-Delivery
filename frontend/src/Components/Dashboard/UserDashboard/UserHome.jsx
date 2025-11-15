@@ -12,9 +12,9 @@ const UserHome = () => {
             <div className="bg-primary bg-opacity-50 p-10 rounded-lg text-center">
                 <div className='flex items-center justify-center gap-5'>
 
-                <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZJJ4MHxDrfwtLDQ4xGYalSV9FOVWR5LG9jg&s' alt="Delicious Food Logo" className="w-40 h-40 mb-4" />
+                <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZJJ4MHxDrfwtLDQ4xGYalSV9FOVWR5LG9jg&s' alt="Delicious Food Logo" className="w-40 h-40 mb-4 " />
                 <div>
-                <h1 className="text-5xl font-bold mb-4 font-aladin">Welcome to Our Restaurant</h1>
+                <h1 className="lg:text-5xl text-2xl font-bold mb-4 font-aladin">Welcome to Our Restaurant</h1>
                 <p className="text-xl mb-8">Experience the best food in town, delivered right to your door.</p>
                 </div>
                 </div>

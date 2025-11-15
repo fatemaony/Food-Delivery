@@ -10,7 +10,7 @@ export const createCheckoutSession = async (req, res) => {
   const { cartItems, user_id, user_email } = req.body;
 
   const line_items = cartItems.map(item => ({
-    price_data: {
+    price_data: { 
       currency: 'usd',
       product_data: {
         name: item.menu_name,
@@ -125,7 +125,7 @@ export const getAllOrders = async (req, res) => {
       GROUP BY o.id, u.name, u.email
       ORDER BY o.created_at DESC;
     `;
-
+     
     res.status(200).json({ success: true, data: orders });
   } catch (error) {
     console.error("Error fetching all orders:", error);

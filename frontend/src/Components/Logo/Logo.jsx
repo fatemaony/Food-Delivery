@@ -8,7 +8,7 @@ const Logo = () => {
     <div className='flex items-center text-primary h-3 justify-center'>
       <img className='w-20 h-20' src={logoImage} alt="logo" />
       <h1 className='text-3xl -ml-3 font-bold 
-      '>MealPort</h1>
+      '>Flavory</h1>
     </div>
     </Link>
   )

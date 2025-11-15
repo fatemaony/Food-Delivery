@@ -19,7 +19,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="bg-base-100 min-h-screen text-base-content px-15">
+    <div className="bg-base-100 min-h-screen text-base-content px-6 lg:px-15">
       
       {/* --- Hero Section --- */}
       <div 
@@ -32,7 +32,7 @@ const Contact = () => {
         }}
       >
         <div className="p-6">
-          <h1 className="text-5xl  md:text-7xl font-bold font-aladin mb-8">Contact With Us</h1>
+          <h1 className="text-3xl  md:text-7xl font-bold font-aladin mb-8">Contact With Us</h1>
           <p className="text-xl md:text-2xl max-w-2xl mx-auto">
             Have a question, feedback, or just want to say hello? Get in touch!
           </p>
@@ -58,7 +58,7 @@ const Contact = () => {
               </div>
               <div>
                 <h3 className="text-xl font-semibold mb-1">Our Location</h3>
-                <p className="text-base-content/70">123 Mealport Street, Food City, 12345</p>
+                <p className="text-base-content/70">123 Flavory Street, Food City, 12345</p>
               </div>
             </div>
 
@@ -78,7 +78,7 @@ const Contact = () => {
               </div>
               <div>
                 <h3 className="text-xl font-semibold mb-1">Email Us</h3>
-                <p className="text-base-content/70">support@mealport.com</p>
+                <p className="text-base-content/70">support@Flavory.com</p>
               </div>
             </div>
 
@@ -96,7 +96,7 @@ const Contact = () => {
 
           {/* --- Right Column: Contact Form --- */}
           <div className="card bg-base-200 shadow-xl p-6 md:p-8">
-            <h2 className="text-3xl font-bold font-aladin text-primary mb-6">Send Us a Message</h2>
+            <h2 className="text-2xl lg:text-4xl font-bold font-aladin text-primary mb-6">Send Us a Message</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name */}
               <div className="form-control">

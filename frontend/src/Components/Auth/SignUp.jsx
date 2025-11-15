@@ -149,7 +149,7 @@ const SignUp = () => {
             {/* Photo URL Field */}
             <div className="form-control mb-4">
               <label className="label">
-                <span className="label-text">Photo URL (Optional)</span>
+                <span className="label-text">Photo URL</span>
               </label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">

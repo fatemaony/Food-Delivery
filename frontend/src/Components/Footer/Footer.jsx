@@ -12,7 +12,7 @@ const Footer = () => {
           {/* Section 1: Brand */}
           <div className="flex-1 px-15 max-w-md">
             <Link to="/" className="text-6xl font-bold font-aladin text-primary">
-              Mealport
+              Flavory
             </Link>
             <p className="mt-4 max-w-xs">
               Your port for fresh and delicious meals, delivered right to your doorstep.
@@ -71,9 +71,9 @@ const Footer = () => {
             <nav>
               <h6 className="footer-title text-base-content font-bold">Contact Us</h6> 
               <ul className="space-y-2">
-                <li><a className="link link-hover hover:text-primary">support@mealport.com</a></li>
+                <li><a className="link link-hover hover:text-primary">support@Flavory.com</a></li>
                 <li><a className="link link-hover hover:text-primary">+1 (234) 567-890</a></li>
-                <li><p>123 Mealport Street, Food City</p></li>
+                <li><p>123 Flavory Street, Food City</p></li>
               </ul>
             </nav>
           </div>
@@ -84,7 +84,7 @@ const Footer = () => {
           {/* Bottom Copyright Bar */}
       <div className="text-center w-full border-base-300">
         <div className="text-center text-base-content">
-            <p>Copyright © {new Date().getFullYear()} - All right reserved by Mealport Industries Ltd.</p>
+            <p>Copyright © {new Date().getFullYear()} - All right reserved by Flavory Industries Ltd.</p>
           </div>
       </div>
        

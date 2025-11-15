@@ -3,8 +3,13 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FaArrowRight, FaStar, FaUtensils, FaClock, FaShieldAlt } from 'react-icons/fa';
 import animated from '../../assets/Lottie/hero.json';
+import { use } from 'react';
+import useAuth from '../../Hooks/useAuth';
+import { Link } from 'react-router';
 
 const Hero = () => {
+
+  const {user}=useAuth()
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -71,13 +76,17 @@ const Hero = () => {
               className="flex flex-col sm:flex-row gap-4 mb-8"
               variants={itemVariants}
             >
+              <Link to={"/menus"}>
               <button className="btn btn-warning btn-lg gap-2 text-white">
                 Order Now
                 <FaArrowRight />
               </button>
+              </Link>
+              <Link to={"/menus"}>
               <button className="btn btn-outline btn-warning btn-lg">
                 View Menu
               </button>
+              </Link>
             </motion.div>
 
            

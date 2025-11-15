@@ -16,7 +16,7 @@ const About = () => {
         }}
       >
         <div className="p-6">
-          <h1 className="text-5xl md:text-7xl font-bold font-aladin mb-4">About Mealport</h1>
+          <h1 className="text-5xl md:text-7xl font-bold font-aladin mb-4">About Flavory</h1>
           <p className="text-xl md:text-2xl max-w-2xl mx-auto">
             Your daily port for fresh, delicious, and fast meals, delivered right to your door.
           </p>
@@ -28,7 +28,7 @@ const About = () => {
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold font-aladin text-primary mb-3">Our Mission</h2>
           <p className="text-lg md:text-xl max-w-3xl mx-auto text-base-content/80">
-            At Mealport, our mission is simple: to connect you with the best local flavors without the hassle. We believe that good food creates good moments, and we're dedicated to making those moments happen faster and more reliably than ever before.
+            At Flavory, our mission is simple: to connect you with the best local flavors without the hassle. We believe that good food creates good moments, and we're dedicated to making those moments happen faster and more reliably than ever before.
           </p>
         </div>
 
@@ -76,7 +76,7 @@ const About = () => {
           <div>
             <h2 className="text-4xl font-bold font-aladin text-primary mb-4">Our Story</h2>
             <p className="text-lg text-base-content/80 mb-4">
-              Founded in [Year] by a group of food lovers, Mealport was born from a simple problem: "Why is it so hard to get great food delivered quickly?"
+              Founded in [Year] by a group of food lovers, Flavory was born from a simple problem: "Why is it so hard to get great food delivered quickly?"
             </p>
             <p className="text-base-content/70 mb-4">
               We started with just a few partner restaurants and a handful of dedicated riders, driven by a passion to serve our community. Today, we've grown into a bustling "port" for hundreds of restaurants and thousands of happy customers, but our core mission of delicious food, fast, remains the same.
@@ -88,7 +88,7 @@ const About = () => {
       {/* --- Join Us (CTA) Section --- */}
       <div className="py-20 px-6 text-center bg-base-100">
         <FaUsers className="text-6xl text-primary mx-auto mb-4" />
-        <h2 className="text-4xl font-bold font-aladin mb-4">Join the Mealport Family</h2>
+        <h2 className="text-4xl font-bold font-aladin mb-4">Join the Flavory Family</h2>
         <p className="text-lg text-base-content/80 max-w-2xl mx-auto mb-8">
           Whether you're a customer craving your next favorite meal, a restaurant looking to expand your reach, or a rider ready to hit the road, there's a place for you here.
         </p>
